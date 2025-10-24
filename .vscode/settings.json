@@ -1,0 +1,4 @@
+{
+    "prettier.configPath": ".vscode/.prettierrc.mjs",
+    "workbench.externalBrowser": "chrome"
+}
