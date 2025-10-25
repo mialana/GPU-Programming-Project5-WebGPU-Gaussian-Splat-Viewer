@@ -11,9 +11,15 @@ import { assert } from "./utils/util";
     const adapter = await navigator.gpu.requestAdapter({
         powerPreference: "high-performance",
     });
+
     if (adapter === null) {
         const h = document.querySelector("#title") as HTMLElement;
         h.innerText = "No adapter is available for WebGPU.";
+
+        // center fallback title
+        document.body.style.display = "flex";
+        document.body.style.alignItems = "center";
+        document.body.style.justifyContent = "center";
         return;
     }
 
@@ -23,6 +29,7 @@ import { assert } from "./utils/util";
                 adapter.limits.maxComputeWorkgroupStorageSize,
             maxStorageBufferBindingSize:
                 adapter.limits.maxStorageBufferBindingSize,
+            maxBufferSize: adapter.limits.maxBufferSize,
         },
     });
 

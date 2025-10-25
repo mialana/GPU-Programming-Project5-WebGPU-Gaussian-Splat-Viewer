@@ -1,7 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Fira+Code:wght@300..700&display=swap");
+
+:root {
+    --base-font: "Fira Code", monospace;
+    --base-block-margin: 12px;
+    --base-item-margin: 8px;
+    --base-header-font-size: 24px;
+    --base-body-font-size: 10px;
+
+    --base-log-container-max-height: calc(var(--base-header-font-size) * 12);
+}
+
 html,
 body {
     height: 100%;
     margin: 0;
+    font-family: var(--base-font);
+    background-color: #000;
+    color: #fff;
 }
 
 canvas {
@@ -10,34 +25,114 @@ canvas {
     display: block;
 }
 
+.hidden-class {
+    max-height: 0 !important;
+}
+
 .console {
     position: absolute;
-    margin: 20px 20px;
+    padding: var(--base-block-margin) var(--base-block-margin);
+    box-sizing: border-box;
 
     & h1,
     h2,
     h3,
     h4 {
-        color: #000;
-        text-shadow:
-            -1px -1px 0 #ccc,
-            1px -1px 0 #ccc,
-            -1px 1px 0 #ccc,
-            1px 1px 0 #ccc;
         margin: auto;
+    }
+
+    #title {
+        line-height: var(--base-header-font-size);
+        margin-bottom: var(--base-item-margin);
+        font-size: var(--base-header-font-size);
+        position: sticky;
+        top: 0px;
+        left: 0px;
+    }
+
+    & #log-container {
+        display: flex;
+        height: fit-content;
+        max-height: var(--base-log-container-max-height);
+        overflow-y: scroll;
+        flex-direction: column-reverse;
+        width: fit-content;
+        transition: max-height 1s ease-in-out;
     }
 
     & #log {
         color: #fff;
-        text-shadow:
-            -1px -1px 0 #555,
-            1px -1px 0 #555,
-            -1px 1px 0 #555,
-            1px 1px 0 #555;
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+
+        & p::before {
+            content: ">";
+            margin-inline-end: 0.25rem;
+        }
 
         & p {
-            font-size: 12px;
-            margin: 0.2em;
+            display: flex;
+            align-items: center;
+            font-size: 10px;
+            background-color: rgba(32, 98, 108, 0.75);
+            width: fit-content;
+            padding-inline: 0.25rem;
+            padding-block: 0.15rem;
+            border-radius: 0.15rem;
+            margin: 0;
+            filter: contrast(150%);
+            cursor: default;
+        }
+
+        & hr {
+            width: 100%;
+            opacity: 50%;
+            margin: 0;
+            margin-block: 0.35rem;
+            border-style: dashed;
         }
     }
+}
+
+/* Hide scrollbar outlines while keeping smooth scrolling */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* Internet Explorer 10+ */
+    scroll-behavior: smooth;
+}
+
+*::-webkit-scrollbar {
+    display: none; /* WebKit browsers */
+}
+
+.tp-dfwv * {
+    font-family: var(--base-font);
+}
+
+/* scale down upload icon */
+.tp-ctnv_icon {
+    scale: 60% !important;
+    margin-top: 4px !important;
+    opacity: 0.75 !important;
+}
+
+/* hide `delete` button */
+.tp-btnv_b {
+    display: none !important;
+}
+
+.tp-ctnv_text {
+    pointer-events: none;
+}
+
+/* modify checkbox */
+.tp-ckbv_w {
+    transform: scale(75%);
+    filter: brightness(150%);
+}
+
+/* align slider vertically */
+.tp-lblv_v {
+    align-self: center !important;
 }

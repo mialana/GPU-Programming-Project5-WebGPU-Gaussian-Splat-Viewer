@@ -54,6 +54,7 @@ function create_ping_pong_buffer(
 const c_radix_log2 = 8;
 export const c_histogram_block_rows = 15;
 
+// note: if any changes are made here, also change the corresponding override in `radix_sort.wgsl`
 export const C = {
     histogram_sg_size: 32,
     histogram_wg_size: 256,
@@ -73,13 +74,9 @@ const c_rs_smem_phase_2 =
 C.rs_mem_dwords = c_rs_smem_phase_2;
 
 function create_pipelines(device: GPUDevice) {
-    // storage array length cannot use override, use string concat const instead
     const module = device.createShaderModule({
         label: "radix sort",
-        // code: radix_sort_wgsl,
-        code: `const rs_mem_dwords = ${C.rs_mem_dwords}u;
-    ${radix_sort_wgsl}
-    `,
+        code: radix_sort_wgsl,
     });
 
     const bind_group_layout = device.createBindGroupLayout({

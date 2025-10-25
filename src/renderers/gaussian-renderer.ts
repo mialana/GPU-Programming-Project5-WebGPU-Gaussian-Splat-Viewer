@@ -12,7 +12,7 @@ const createBuffer = (
     label: string,
     size: number,
     usage: GPUBufferUsageFlags,
-    data?: ArrayBuffer | ArrayBufferView,
+    data?: ArrayBuffer,
 ) => {
     const buffer = device.createBuffer({ label, size, usage });
     if (data) device.queue.writeBuffer(buffer, 0, data);
@@ -33,12 +33,43 @@ export default function get_renderer(
 
     const nulling_data = new Uint32Array([0]);
 
+    const preprocessPipelineLayout = device.createPipelineLayout({
+        bindGroupLayouts: [
+            device.createBindGroupLayout({ entries: [] }), // group(0)
+            device.createBindGroupLayout({ entries: [] }), // group(1)
+            device.createBindGroupLayout({
+                entries: [
+                    {
+                        binding: 0,
+                        visibility: GPUShaderStage.COMPUTE,
+                        buffer: { type: "storage" },
+                    },
+                    {
+                        binding: 1,
+                        visibility: GPUShaderStage.COMPUTE,
+                        buffer: { type: "storage" },
+                    },
+                    {
+                        binding: 2,
+                        visibility: GPUShaderStage.COMPUTE,
+                        buffer: { type: "storage" },
+                    },
+                    {
+                        binding: 3,
+                        visibility: GPUShaderStage.COMPUTE,
+                        buffer: { type: "storage" },
+                    },
+                ],
+            }),
+        ],
+    });
+
     // ===============================================
     //    Create Compute Pipeline and Bind Groups
     // ===============================================
     const preprocess_pipeline = device.createComputePipeline({
         label: "preprocess",
-        layout: "auto",
+        layout: preprocessPipelineLayout,
         compute: {
             module: device.createShaderModule({ code: preprocessWGSL }),
             entryPoint: "preprocess",

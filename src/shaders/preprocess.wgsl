@@ -57,6 +57,7 @@ struct Gaussian {
 
 struct Splat {
     //TODO: store information for 2D splat rendering
+    temp: vec3f
 };
 
 //TODO: bind your data here

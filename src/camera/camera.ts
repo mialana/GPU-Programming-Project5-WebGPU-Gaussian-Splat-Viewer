@@ -1,5 +1,5 @@
 import { Mat3, mat3, Mat4, mat4, Vec3, vec3, Vec2, vec2 } from "wgpu-matrix";
-import { log, time, timeLog } from "../utils/simple-console";
+import { log } from "../utils/simple-console";
 
 interface CameraJson {
     id: number;
@@ -68,9 +68,7 @@ interface CameraPreset {
     rotation: Mat4;
 }
 
-export async function load_camera_presets(
-    file: string,
-): Promise<CameraPreset[]> {
+export async function load_camera_presets(file: File): Promise<CameraPreset[]> {
     const blob = new Blob([file]);
     const arrayBuffer = await new Promise((resolve, reject) => {
         const reader = new FileReader();
@@ -201,7 +199,8 @@ export class Camera {
             intermediate_float_32_array,
         );
     }
-    set_preset(preset: CameraPreset): void {
+    set_preset(index: number, preset: CameraPreset): void {
+        log(`set to camera preset ${index}`);
         vec3.copy(preset.position, this.position);
         mat4.copy(preset.rotation, this.rotation);
         this.update_buffer();

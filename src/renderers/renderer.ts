@@ -8,7 +8,13 @@ import {
 import { default as get_renderer_pointcloud } from "./point-cloud-renderer";
 import { Camera, load_camera_presets } from "../camera/camera";
 import { CameraControl } from "../camera/camera-control";
-import { time, timeReturn } from "../utils/simple-console";
+import {
+    log,
+    logSeparator,
+    time,
+    timeReturn,
+    timeLog,
+} from "../utils/simple-console";
 
 export interface Renderer {
     frame: (encoder: GPUCommandEncoder, texture_view: GPUTextureView) => void;
@@ -50,6 +56,7 @@ export default async function init(
     const params = {
         fps: 0.0,
         gaussian_multiplier: 1,
+        show_logs: true,
         renderer: "pointcloud",
         ply_file: "",
         cam_file: "",
@@ -65,6 +72,108 @@ export default async function init(
             readonly: true,
         });
     }
+
+    async function load_ply(file: File) {
+        if (file) {
+            log(`loading: ${file.name}`);
+            time();
+
+            let pc;
+            try {
+                pc = await load(file, device);
+            } catch (err) {
+                if (err instanceof RangeError) {
+                    const msgParts = err.message.split("\n");
+                    msgParts.forEach((part) => {
+                        log(part, 2); // log as a warning, but current scene can continue rendering
+                    });
+                    logSeparator();
+                    return;
+                }
+            }
+
+            pointcloud_renderer = get_renderer_pointcloud(
+                pc,
+                device,
+                presentation_format,
+                camera.uniform_buffer,
+            );
+            gaussian_renderer = get_renderer_gaussian(
+                pc,
+                device,
+                presentation_format,
+                camera.uniform_buffer,
+            );
+            renderers = {
+                pointcloud: pointcloud_renderer,
+                gaussian: gaussian_renderer,
+            };
+            renderer = renderers[params.renderer];
+            ply_file_loaded = true;
+
+            timeLog(`${file.name} load time`);
+        } else {
+            log(`invalid ply file.`);
+            ply_file_loaded = false;
+        }
+        logSeparator();
+    }
+
+    async function load_cam(file: File) {
+        if (file) {
+            log(`loading: ${file.name}`);
+            cameras = await load_camera_presets(file);
+            camera.set_preset(0, cameras[0]);
+            cam_file_loaded = true;
+        } else {
+            log(`invalid camera json.`);
+            cam_file_loaded = false;
+        }
+        logSeparator();
+    }
+    {
+        // load a default ply hosted on site
+        async function loadDefaults(
+            plyUrl: string = "resources/bonsai/bonsai.compressed.ply",
+            camUrl: string = "resources/bonsai/cameras.json",
+        ) {
+            try {
+                const res = await fetch(plyUrl, { priority: "high" });
+                if (!res.ok) throw new Error(`Failed to fetch ${plyUrl}`);
+                const blob = await res.blob();
+                const file = new File([blob], plyUrl.split("/").pop(), {
+                    type: "application/octet-stream",
+                });
+                await load_ply(file);
+            } catch (err) {
+                console.error("Error loading default PLY:", err);
+            }
+
+            try {
+                const res = await fetch(camUrl);
+                if (!res.ok) throw new Error(`Failed to fetch ${camUrl}`);
+                const blob = await res.blob();
+                const file = new File([blob], "cameras.json", {
+                    type: "application/octet-stream",
+                });
+                await load_cam(file);
+            } catch (err) {
+                console.error("Error loading default camera:", err);
+            }
+        }
+
+        await loadDefaults();
+    }
+
+    {
+        pane.addInput(params, "show_logs", {
+            label: "show logs",
+        }).on("change", () => {
+            document
+                .getElementById("log-container")
+                .classList.toggle("hidden-class");
+        });
+    }
     {
         pane.addInput(params, "renderer", {
             options: {
@@ -77,61 +186,30 @@ export default async function init(
     }
     {
         pane.addInput(params, "ply_file", {
+            label: "PLY File",
             view: "file-input",
-            lineCount: 3,
+            lineCount: 1,
             filetypes: [".ply"],
             invalidFiletypeMessage: "We can't accept those filetypes!",
-        }).on("change", async (file) => {
-            const uploadedFile = file.value;
-            if (uploadedFile) {
-                const pc = await load(uploadedFile, device);
-                pointcloud_renderer = get_renderer_pointcloud(
-                    pc,
-                    device,
-                    presentation_format,
-                    camera.uniform_buffer,
-                );
-                gaussian_renderer = get_renderer_gaussian(
-                    pc,
-                    device,
-                    presentation_format,
-                    camera.uniform_buffer,
-                );
-                renderers = {
-                    pointcloud: pointcloud_renderer,
-                    gaussian: gaussian_renderer,
-                };
-                renderer = renderers[params.renderer];
-                ply_file_loaded = true;
-            } else {
-                ply_file_loaded = false;
-            }
-        });
+        }).on("change", (file: any) => load_ply(file.value));
     }
     {
         pane.addInput(params, "cam_file", {
+            label: "cam JSON",
             view: "file-input",
-            lineCount: 3,
+            lineCount: 1,
             filetypes: [".json"],
             invalidFiletypeMessage: "We can't accept those filetypes!",
-        }).on("change", async (file) => {
-            const uploadedFile = file.value;
-            if (uploadedFile) {
-                cameras = await load_camera_presets(file.value);
-                camera.set_preset(cameras[0]);
-                cam_file_loaded = true;
-            } else {
-                cam_file_loaded = false;
-            }
-        });
+        }).on("change", (file: any) => load_cam(file.value));
     }
     {
-        pane.addInput(params, "gaussian_multiplier", { min: 0, max: 1.5 }).on(
-            "change",
-            (e) => {
-                //TODO: Bind constants to the gaussian renderer.
-            },
-        );
+        pane.addInput(params, "gaussian_multiplier", {
+            label: "gaussian multiplier",
+            min: 0,
+            max: 1.5,
+        }).on("change", (e) => {
+            //TODO: Bind constants to the gaussian renderer.
+        });
     }
 
     document.addEventListener("keydown", (event) => {
@@ -147,8 +225,7 @@ export default async function init(
             case "8":
             case "9":
                 const i = parseInt(event.key);
-                console.log(`set to camera preset ${i}`);
-                camera.set_preset(cameras[i]);
+                camera.set_preset(i, cameras[i]);
                 break;
         }
     });

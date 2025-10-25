@@ -7,7 +7,9 @@ override rs_radix_size = 1u << rs_radix_log2;    // 256 entries into the radix t
 override rs_keyval_size = 32u / rs_radix_log2;
 const rs_histogram_block_rows = 15u;
 const rs_scatter_block_rows = rs_histogram_block_rows;
-// const rs_mem_dwords = 4096u;
+
+override c_rs_smem_phase_2 = rs_radix_size + rs_scatter_block_rows * scatter_wg_size;
+override rs_mem_dwords = c_rs_smem_phase_2;
 
 override prefix_wg_size = 1u << 7u; // one thread operates on 2 prefixes at the same time
 override scatter_wg_size = 1u << 8u;
