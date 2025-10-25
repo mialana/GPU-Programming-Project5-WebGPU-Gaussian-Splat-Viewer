@@ -1,4 +1,4 @@
-# Project5-WebGPU-Gaussian-Splat-Viewer
+# Project5-WebGPU-Gaussian-Splat-Renderer
 
 **University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 5**
 
