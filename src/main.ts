@@ -6,6 +6,8 @@ import { assert } from "./utils/util";
     if (navigator.gpu === undefined) {
         const h = document.querySelector("#title") as HTMLElement;
         h.innerText = "WebGPU is not supported in this browser.";
+
+        document.body.classList.add("fallback-title");
         return;
     }
     const adapter = await navigator.gpu.requestAdapter({
@@ -16,10 +18,7 @@ import { assert } from "./utils/util";
         const h = document.querySelector("#title") as HTMLElement;
         h.innerText = "No adapter is available for WebGPU.";
 
-        // center fallback title
-        document.body.style.display = "flex";
-        document.body.style.alignItems = "center";
-        document.body.style.justifyContent = "center";
+        document.body.classList.add("fallback-title");
         return;
     }
 
