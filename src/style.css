@@ -78,6 +78,7 @@ canvas {
         }
 
         & p {
+            white-space: pre;
             display: flex;
             align-items: center;
             font-size: 10px;

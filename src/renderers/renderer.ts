@@ -57,7 +57,7 @@ export default async function init(
         fps: 0.0,
         gaussian_multiplier: 1,
         show_logs: true,
-        renderer: "pointcloud",
+        renderer: "gaussian",
         ply_file: "",
         cam_file: "",
     };
@@ -134,8 +134,8 @@ export default async function init(
     {
         // load a default ply hosted on site
         async function loadDefaults(
-            plyUrl: string = "resources/bonsai/bonsai.compressed.ply",
-            camUrl: string = "resources/bonsai/cameras.json",
+            plyUrl: string = "resources/crochet/crochet.ply",
+            camUrl: string = "resources/crochet/cameras.json",
         ) {
             try {
                 const res = await fetch(plyUrl, { priority: "high" });
@@ -209,6 +209,14 @@ export default async function init(
             max: 1.5,
         }).on("change", (e) => {
             //TODO: Bind constants to the gaussian renderer.
+            if (!gaussian_renderer) {
+                return;
+            }
+            device.queue.writeBuffer(
+                gaussian_renderer.splatParamsBuffer,
+                0,
+                new Float32Array([params.gaussian_multiplier]),
+            );
         });
     }
 

@@ -1,5 +1,6 @@
 import { vec3, mat3, mat4, quat } from "wgpu-matrix";
 import { Camera } from "./camera";
+import { log } from "../utils/simple-console";
 
 export class CameraControl {
     element: HTMLCanvasElement;
@@ -25,8 +26,11 @@ export class CameraControl {
                 "wheel",
                 this.wheelCallback.bind(this),
             );
+            this.element.removeEventListener(
+                "keydown",
+                this.spaceCallback.bind(this),
+            );
         }
-
         this.element = value;
         this.element.addEventListener(
             "pointerdown",
@@ -41,6 +45,7 @@ export class CameraControl {
         this.element.addEventListener("contextmenu", (e) => {
             e.preventDefault();
         });
+        window.addEventListener("keydown", this.spaceCallback.bind(this));
     }
 
     private panning = false;
@@ -112,5 +117,30 @@ export class CameraControl {
         vec3.mulScalar(d, -xDelta * 0.01, d);
         vec3.add(d, this.camera.position, this.camera.position);
         this.camera.update_buffer();
+    }
+
+    async spaceCallback(event: KeyboardEvent) {
+        if (event.key === " ") {
+            let stream: string = '"position": [\n';
+            stream += `    ${this.camera.position}\n],\n"rotation": [\n`;
+
+            let rot = this.camera.rotation;
+            for (let offset = 0; offset <= 8; offset += 4) {
+                // only traverse first three rows of mat4
+                stream += `    [${rot[offset]}, ${rot[offset + 1]}, ${rot[offset + 2]}]`;
+                if (offset != 8) {
+                    stream += ",";
+                }
+                stream += "\n";
+            }
+            stream += "]";
+
+            log(stream);
+
+            try {
+                await navigator.clipboard.writeText(stream);
+                log("camera data copied to clipboard");
+            } catch (_) {}
+        }
     }
 }
