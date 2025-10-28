@@ -1,26 +1,21 @@
-# Project5-WebGPU-Gaussian-Splat-Renderer
+# Gaussian Splat Renderer in WebGPU
 
-**University of Pennsylvania, CIS 565: GPU Programming and Architecture, Project 5**
+<img src="images/readme/thumbnail.png" alt="thumbnail" width="600">
 
-- (TODO) YOUR NAME HERE
-- Tested on: (TODO) **Google Chrome 222.2** on
-  Windows 22, i7-2222 @ 2.22GHz 22GB, GTX 222 222MB (Moore 2222 Lab)
+![preview](images/readme/bicycle_preview.gif)
+<img src="images/readme/preview.gif" alt="crochet preview" width="400" />
+<img src="images/readme/zoom.gif" alt="crochet zoom" width="400" />
 
-### Live Demo
+## [Live Deployment on my Personal Portfolio Domain Here](https://gaussian-splat-renderer.webgpu.amyliu.dev/)
 
-[![](img/thumb.png)](http://TODO.github.io/Project4-WebGPU-Forward-Plus-and-Clustered-Deferred)
+## Overview
+This project implements a real-time 3D Gaussian Splat Viewer using WebGPU. It visualizes pre-trained Gaussian point cloud data by reconstructing continuous surfaces from discrete splats, inspired by the 3D Gaussian Splatting paper (Kerbl et al., 2023). The viewer supports both a basic point cloud renderer and a fully featured Gaussian renderer with compute-based preprocessing and depth sorting.
 
-### Demo Video/GIF
+In the simple Point Cloud Renderer, points are transformed using the Model–View–Projection (MVP) matrix and drawn onto the canvas using a render pipeline. 
 
-[![](img/video.mp4)](TODO)
+In the Gaussian Renderer, each 3D Gaussian is preprocessed into a 2D screen-space quad that accounts for scale, rotation, and color derived from spherical harmonics coefficients. The renderer performs view-frustum culling, covariance computation, SH color evaluation, and back-to-front depth sorting to produce accurate transparency and smooth blending.
 
-### (TODO: Your README)
-
-_DO NOT_ leave the README to the last minute! It is a crucial part of the
-project, and we will not be able to grade you without a good README.
-
-This assignment has a considerable amount of performance analysis compared
-to implementation work. Complete the implementation early to leave time!
+This project demonstrates key GPU programming concepts including compute pipelines, indirect drawing, atomic operations, and shader-based data processing in WGSL. It also highlights performance tradeoffs in workgroup sizing, culling, and Gaussian density for real-time rendering in WebGPU.
 
 ### Credits
 
@@ -29,3 +24,13 @@ to implementation work. Complete the implementation early to leave time!
 - [stats.js](https://github.com/mrdoob/stats.js)
 - [wgpu-matrix](https://github.com/greggman/wgpu-matrix)
 - Special Thanks to: Shrek Shao (Google WebGPU team) & [Differential Guassian Renderer](https://github.com/graphdeco-inria/diff-gaussian-rasterization)
+
+## Fine Details
+### Developer Info
+Amy Liu -- [Personal Website](https://amyliu.dev), [LinkedIn](https://linkedin.com/in/miyalana), [Github](https://github.com/mialana).
+
+### Tested on
+- Browser Provider: Google Chromium
+- Desktops:
+  -  Fedora 42 KDE Plasma, Wayland Protocol, Optimus GPU (Intel(R) Core(TM) Ultra 9 275HX 32GiB, NVIDIA GeForce RTX 5070Ti 12227MiB)
+  -  Windows 22, Optimus GPU (Intel(R) Core(TM) Ultra 9 275HX 32GiB, NVIDIA GeForce RTX 5070Ti 12227MiB)

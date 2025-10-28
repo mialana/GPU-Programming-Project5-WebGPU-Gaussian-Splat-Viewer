@@ -35,6 +35,7 @@ struct SortInfos {
     odd_pass: u32,
 }
 
+// matches struct in `point_cloud.wgsl`
 struct CameraUniforms {
     view: mat4x4<f32>,
     view_inv: mat4x4<f32>,
@@ -224,9 +225,9 @@ fn preprocess(@builtin(global_invocation_id) gid: vec3<u32>, @builtin(num_workgr
     if (det == 0.0) { return; }
 
     let mid = 0.5*(cov2D[0][0] + cov2D[1][1]);
-    let λ1 = mid + sqrt(max(0.1, mid*mid - det));
-    let λ2 = mid - sqrt(max(0.1, mid*mid - det));
-    let radiusPixel = ceil(3.0 * sqrt(max(λ1, λ2)));
+    let lambda1 = mid + sqrt(max(0.1, mid*mid - det));
+    let lambda2 = mid - sqrt(max(0.1, mid*mid - det));
+    let radiusPixel = ceil(3.0 * sqrt(max(lambda1, lambda2)));
     let ndc_MaxSize = vec2(2.0 * radiusPixel) / camUnifs.viewport;
 
     // sort
