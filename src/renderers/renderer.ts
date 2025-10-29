@@ -73,6 +73,11 @@ export default async function init(
         });
     }
 
+    // stop view from changing when gaussian_multiplier is set with number keys
+    pane.element.addEventListener("keydown", (event) => {
+        event.stopPropagation();
+    });
+
     async function load_ply(file: File) {
         if (file) {
             log(`loading: ${file.name}`);

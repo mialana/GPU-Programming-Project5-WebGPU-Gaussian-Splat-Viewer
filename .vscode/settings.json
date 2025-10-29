@@ -2,5 +2,6 @@
     "prettier.configPath": ".vscode/.prettierrc.mjs",
     "workbench.externalBrowser": "chrome",
     "autoHide.autoHideSideBar": false,
-    "autoHide.autoHideAuxiliaryBar": false
+    "autoHide.autoHideAuxiliaryBar": false,
+    "files.eol": "\n"
 }

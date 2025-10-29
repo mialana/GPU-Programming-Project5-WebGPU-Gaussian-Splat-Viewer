@@ -29,6 +29,11 @@ import { assert } from "./utils/util";
             maxStorageBufferBindingSize:
                 adapter.limits.maxStorageBufferBindingSize,
             maxBufferSize: adapter.limits.maxBufferSize,
+            maxComputeWorkgroupSizeX: adapter.limits.maxComputeWorkgroupSizeX,
+            maxComputeWorkgroupSizeY: adapter.limits.maxComputeWorkgroupSizeY,
+            maxComputeWorkgroupSizeZ: adapter.limits.maxComputeWorkgroupSizeZ,
+            maxComputeInvocationsPerWorkgroup:
+                adapter.limits.maxComputeInvocationsPerWorkgroup,
         },
     });
 

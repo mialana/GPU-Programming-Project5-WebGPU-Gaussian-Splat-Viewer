@@ -7,5 +7,5 @@ export default {
     tabWidth: 4,
     useTabs: false,
     semi: true,
-    endOfLine: "auto",
+    endOfLine: "lf",
 };
